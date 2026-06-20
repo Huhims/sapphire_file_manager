@@ -13,7 +13,7 @@ TOOLS = [
                 "properties": {
                     "input_cmd": {
                         "type": "string",
-                        "description": "If I need to get a file list, write: 'list'. If select directory, write: 'cd,foldername'. If step back directory, write: 'cd,go!back'. If read the entire text file, write: 'r,filename'. if read only one line in a text file, write: 'rl,filename,lineNumber'. The first line in the text file started with number '1'. If create or overwrite a text file, write: 'w,filename,AI write text here...'. If append text in file, write: 'a,filename,AI write text here...'. If I want to jump straight to the Directory I need in Directory Tree, write: 'rootDIR:/foldername/foldername/foldername' ... and so on... If I want to jump straight to the root Directory, write: 'rootDIR:/'."
+                        "description": "If I need to get a file list, write: 'list'. If select directory, write: 'cd,foldername'. If step back directory, write: 'cd,go!back'. If read the entire text file, write: 'r,filename'. if read only one line in a text file, write: 'rl,filename,lineNumber'. The first line in the text file started with number '1'. If create or overwrite a text file, write: 'w,filename,AI write text here...'. If append text in file, write: 'a,filename,AI write text here...'. If I want to jump straight to the Directory I need in Directory Tree, write: 'rootDIR:/foldername/foldername/foldername' ... and so on... If I want to jump straight to the root Directory, write: 'rootDIR:/'. If I want to create a new directory, write: 'mk,foldername'."
                     }
                 },
                 "required": ["input_cmd"]
@@ -238,6 +238,17 @@ def write_TextFile(afile):
     if oLINE == True:
         oLINE = False
 
+def CreateDIR(_DIRname_):
+    global sapDIR, pre_path, _FINAL_str
+
+    if platform.system() == "Windows":
+        Path(str(sapDIR) + '\\' + _DIRname_).mkdir(parents=True, exist_ok=True)
+    else:
+        Path(str(sapDIR) + '/' + _DIRname_).mkdir(parents=True, exist_ok=True)
+
+    
+    _FINAL_str = 'Directory created.'
+
 def execute(function_name, arguments, config, plugin_settings=None):
     global sapDIR, _FINAL_str, oLINE, ordered_line, wordPAD
     command = ""
@@ -351,4 +362,16 @@ def execute(function_name, arguments, config, plugin_settings=None):
             else:
                 return "Error: Invalid 'rootDIR' command format. Expected 'rootDIR:/path'.", False
 
-        return f"invalid command", False
+        # Check for "mk" command
+        elif input_cmd.startswith("mk,"): # Check if it starts with "mk,"
+            parts = input_cmd.split(",", 1)
+            if len(parts) == 2:
+                command = parts[0] # "mk"
+                target = parts[1]  # This will be created "new_dir"
+                CreateDIR(target)
+                return f"{_FINAL_str}", True
+            else:
+                return "Error: Invalid 'mk' command format. Expected 'mk,foldername'.", False
+
+        else:
+            return f"invalid command", False
