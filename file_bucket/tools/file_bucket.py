@@ -239,14 +239,13 @@ def write_TextFile(afile):
         oLINE = False
 
 def CreateDIR(_DIRname_):
-    global sapDIR, pre_path, _FINAL_str
+    global sapDIR, _FINAL_str
 
     if platform.system() == "Windows":
         Path(str(sapDIR) + '\\' + _DIRname_).mkdir(parents=True, exist_ok=True)
     else:
         Path(str(sapDIR) + '/' + _DIRname_).mkdir(parents=True, exist_ok=True)
 
-    
     _FINAL_str = 'Directory created.'
 
 def execute(function_name, arguments, config, plugin_settings=None):
