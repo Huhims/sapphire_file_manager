@@ -1,0 +1,12 @@
+{
+  "name": "file_bucket",
+  "version": "1.0.0",
+  "description": "The AI ​​can work in its own sandbox directory. Read/Write/Create text files.",
+  "author": "Huhims",
+  "default_enabled": true,
+  "capabilities": {
+    "tools": [
+      "tools/file_bucket.py"
+    ]
+  }
+}
