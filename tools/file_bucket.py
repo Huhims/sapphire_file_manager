@@ -13,7 +13,7 @@ TOOLS = [
                 "properties": {
                     "input_cmd": {
                         "type": "string",
-                        "description": "If I need to get a file list, write: 'list'. If select directory, write: 'cd,foldername'. If step back directory, write: 'cd,go!back'. If read the entire text file, write: 'r,filename'. if read only one line in a text file, write: 'rl,filename,lineNumber'. The first line in the text file started with number '1'. If create or overwrite a text file, write: 'w,filename,AI write text here...'. If append text in file, write: 'a,filename,AI write text here...'. If I want to jump straight to the Directory I need in Directory Tree, write: 'rootDIR:/foldername/foldername/foldername' ... and so on... If I want to jump straight to the root Directory, write: 'rootDIR:/'. If I want to create a new directory, write: 'mk,foldername'."
+                        "description": "If I need to get a file list or see my location path, write: 'list'. If select directory, write: 'cd,foldername'. If step back directory, write: 'cd,go!back'. If read the entire text file, write: 'r,filename'. if read only one line in a text file, write: 'rl,filename,lineNumber'. The first line in the text file started with number '1'. If create or overwrite a text file, write: 'w,filename,AI write text here...'. If append text in file, write: 'a,filename,AI write text here...'. If I want to jump straight to the Directory I need in Directory Tree, write: 'rootDIR:/foldername/foldername/foldername' ... and so on... If I want to jump straight to the root Directory, write: 'rootDIR:/'. If I want to create a new directory, write: 'mk,foldername'. If I want to delete a directory, write: 'xd,foldername'. If I want to delete a file, write: 'xf,filename'. From the current directory I can use direct call for read and write commands, for example: 'r,foldername/filename'."
                     }
                 },
                 "required": ["input_cmd"]
@@ -248,6 +248,42 @@ def CreateDIR(_DIRname_):
 
     _FINAL_str = 'Directory created.'
 
+def delDIR(_DIRname_):
+    global sapDIR, _FINAL_str
+
+    if platform.system() == "Windows":
+        _TARGET_ = Path(str(sapDIR) + '\\' + _DIRname_)
+    else:
+        _TARGET_ = Path(str(sapDIR) + '/' + _DIRname_)
+
+    if _TARGET_.is_dir():
+        try:
+            _TARGET_.rmdir()
+            if not _TARGET_.is_dir():
+                _FINAL_str = 'Directory removed.'
+        except:
+            _FINAL_str = 'The removal process has been canceled: Probably the directory is not empty.'
+    else:
+        _FINAL_str = 'Directory does not exist.'
+
+def delFILE(_FILEname_):
+    global sapDIR, _FINAL_str
+
+    if platform.system() == "Windows":
+        _TARGET_ = Path(str(sapDIR) + '\\' + _FILEname_)
+    else:
+        _TARGET_ = Path(str(sapDIR) + '/' + _FILEname_)
+
+    if _TARGET_.is_file():
+        try:
+            _TARGET_.unlink()
+            if not _TARGET_.is_file():
+                _FINAL_str = 'File removed.'
+        except:
+            _FINAL_str = 'The removal process has been canceled: Maybe there is no permission.'
+    else:
+        _FINAL_str = 'File does not exist.'
+
 def execute(function_name, arguments, config, plugin_settings=None):
     global sapDIR, _FINAL_str, oLINE, ordered_line, wordPAD
     command = ""
@@ -371,6 +407,28 @@ def execute(function_name, arguments, config, plugin_settings=None):
                 return f"{_FINAL_str}", True
             else:
                 return "Error: Invalid 'mk' command format. Expected 'mk,foldername'.", False
+
+        # Check for "xd" (delete DIR) command
+        elif input_cmd.startswith("xd,"): # Check if it starts with "xd,"
+            parts = input_cmd.split(",", 1)
+            if len(parts) == 2:
+                command = parts[0] # "xd"
+                target = parts[1]  # This will be "Directory"                
+                delDIR(target)
+                return f"{_FINAL_str}", True
+            else:
+                return "Error: Invalid 'xd' command format. Expected 'xd,foldername'.", False
+
+        # Check for "xf" (delete File) command
+        elif input_cmd.startswith("xf,"): # Check if it starts with "xf,"
+            parts = input_cmd.split(",", 1)
+            if len(parts) == 2:
+                command = parts[0] # "xf"
+                target = parts[1]  # This will be "File"                
+                delFILE(target)
+                return f"{_FINAL_str}", True
+            else:
+                return "Error: Invalid 'xf' command format. Expected 'xf,filename'.", False
 
         else:
             return f"invalid command", False

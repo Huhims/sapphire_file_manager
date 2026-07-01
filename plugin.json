@@ -1,7 +1,7 @@
 {
   "name": "file_bucket",
-  "version": "1.0.0",
-  "description": "The AI ​​can work in its own sandbox directory. Read/Write/Create text files.",
+  "version": "1.0.2",
+  "description": "Local SANDBOX",
   "author": "Huhims",
   "default_enabled": true,
   "capabilities": {
